@@ -31,6 +31,32 @@
 }
 
 {
+    /** 💬 Parameter ReadOnly */
+    const strArr:string[] = ["가","나"];
+    // ReadOnly 사용 ❌
+    function noReadOnlyVer(strArr : string[]) : void{
+        strArr.push("다");
+        console.log(strArr);
+    }
+    noReadOnlyVer(strArr);
+
+    /***
+     * ReadOnly 사용 
+     * 💬 주의 사항 
+     *    - (strArr : readonly string[]) 같은 경우 이상이 없지만
+     *    - (strArr : readonly Array<string>) 의 경우 Error 발생
+     *       - ErroMsg : 'readonly' type modifier is only permitted on array and tuple literal types.
+     */
+    //function readOnlyVer(strArr : readonly Array<string>) : void{  // ☠️ ERROR
+    function readOnlyVer(strArr : readonly string[]) : void{    
+        //strArr.push("다");  // ☠️ Error 발생
+        console.log(strArr);
+    }
+    noReadOnlyVer(strArr);
+
+}
+
+{
     /**
         Javascript, Typescript 둘다 활용 가능한 유용한 기능
     **/
