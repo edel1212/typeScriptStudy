@@ -277,6 +277,7 @@
 <hr/>
 
 ## Union 사용 예시
+**- 👉 Intersection과 반대 개념**
 ```typescript
 // TypeScript
 
@@ -298,9 +299,64 @@
     
 }
 ```
+
 <hr/>
 
-## Union 사용 예시
+## IntersectionType 사용 예시  
+**- 👉 Union과 반대 개념**
+```typescript
+// TypeScript
+
+{
+    /***
+     * Intersection Type : &&(AND)로 생각하면 된다, Union과 반대
+     */
+    type Student = {
+        name : string;
+        score : number;
+    }
+
+    type Worker = {
+        empolyeeId : number;
+        work : () => void;
+    }
+
+    /** 
+     * 👉 person 인자값의 타입은 현재 2개로 지정함 
+     *    - 따라서 두가지 타입의 모든 정보에 접근이 가능함
+     * */
+    function internWork(person : Student & Worker){
+        // Worker 정보
+        console.log(person.empolyeeId);
+        console.log(person.work);
+        
+        // Student 정보
+        console.log(person.name);
+        console.log(person.score);
+    }
+
+    /**
+     * 💬 단 그렇기에 넘기는 파라미터값은 
+     *    - 두가지 타입이 갖는 모든 값을 넣어줘야한다!
+     * 
+     * ☠️ 부족하면 컴파일 Error가 발생한다.
+     *   -Error Msg : Argument of type '{ name: string; score: number; }' is not 
+     *               assignable to parameter of type 'Student & Worker'.
+     *               Type '{ name: string; score: number; }' is missing the following
+     *               properties from type 'Worker': empolyeeId, work
+     */
+    internWork({
+        name : "yoo",
+        score : 100,
+        empolyeeId : 1,
+        work : ()=> {}
+    });
+}
+```
+
+<hr/>
+
+## Discriminate 사용 예시
 ```typescript
 // TypeScript
 
@@ -342,5 +398,59 @@
     function printLoginState(state : LoginSate){
         console.log(state.result === "success" ? state.response.body : state.reason);
     }
+}
+```
+
+<hr/>
+
+## Enum 사용 예시
+**- 👉 Union을 사용하자**
+```typescript
+// TypeScript
+
+{
+    /***
+     * Enum 아래와 같이 사용할수 있으나
+     * 👎 비추천함 값을 유지하지 못함
+     *    ex ) 
+     *         let test: Days;
+     *         test = Days.Friday;  // 이상없음
+      *        test = 100           // 이상없음
+      * 
+      * 👍  따라서 같은 기능을하는 Union을 사용해주자!!!
+      * 
+     */
+    enum Days {
+        Monday,     //0
+        Tuesday,    //1
+        Wedensday,  //2
+        Thursday,   //3
+        Friday,     //4
+        Satarday    //5
+    }
+    console.log(Days.Friday);
+
+    // 값을 지정 - 숫자 [ 자동으로 추론하여 값을 정해줌 ]
+    enum DaysVerNum {
+        Monday = 1,     //1
+        Tuesday,        //2
+        Wedensday,      //3
+        Thursday,       //4
+        Friday,         //5
+        Satarday        //6
+    }
+    console.log(DaysVerNum.Friday);
+
+    // 값을 지정 - 문자열 [ 자동으로 추론하여 값을 정하지 못함 ❌ ]
+    enum DaysVerStr {
+        Monday      = "Mon",     
+        Tuesday     = "Tue",        
+        Wedensday   = "Wen",        
+        Thursday    = "Thu",       
+        Friday      = "Fri",                
+        Satarday    = "Sat",                   
+    }
+    console.log(DaysVerStr.Friday);
+
 }
 ```
