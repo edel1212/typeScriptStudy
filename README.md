@@ -109,7 +109,7 @@
 <hr/>
 
 ## Function 사용 예시
-```typescriopt
+```typescript
 // TypeScript
 
 {
