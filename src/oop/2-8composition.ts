@@ -1,6 +1,6 @@
 {
     /**
-     * Composition 구성이란?
+     * Composition 구성이란?  👎 별로 좋은 방법이 아니나 Interface와 비교를 위한 코드이다.
      * - 필요한것들을 하나하나 구성하여 조립하는 것이라 생각하면 좋다.
      * - 필요한 구성을 나눠서 생성메서드에 넣어 사용하는것은 Dependency Injection 한다.
      * 
