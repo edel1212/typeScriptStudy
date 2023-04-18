@@ -1266,3 +1266,226 @@
     //__Eof__
 }
 ```
+
+<hr/>
+
+## OOP(객체지향 프로그래밍) - (Composition)구성 방식이란 [Interface 사용]?
+### - Class간의 결합도가 낮아짐! 👍
+
+```typescript
+//TypeScript - Interface 사용
+
+{
+    type CoffeCup = {
+        // code..
+    }
+
+    interface IcoffeMaker{
+        makeCoffe(shots: number):CoffeCup;
+    }
+
+    class CoffeMakerImpl implements IcoffeMaker{
+        // code..
+    }
+    
+    /////////////////////////////////////////////////////////////
+
+    // 결합도를 낮추기 위한 Milke Interface
+    interface MilkeForther{
+        makeMilk(coffeeCup : CoffeCup):CoffeCup;
+    }
+
+    // 결합도를 낮추기 위한 Suger Interface
+    interface SugarProvider{
+        makeSugar(coffeeCup : CoffeCup):CoffeCup;
+    }
+
+    // 우유를 스팀하는 기능 - MilkeForther 구현
+    class CheapMilkSteamer implements MilkeForther{        
+        public makeMilk(coffeeCup : CoffeCup):CoffeCup{
+            // TODO .. Busi Logic
+        }
+    }
+
+    // 비싼 우유 스팀 기능을한다 - MilkeForther 구현
+    class HighLevelMilkSteamer implements MilkeForther{
+        public makeMilk(coffeeCup : CoffeCup):CoffeCup{
+            // TODO .. Busi Logic
+        }
+    }
+
+    // 차가운 우유 스팀 기능을한다 - MilkeForther 구현
+    class ColdMilkSteamer implements MilkeForther{
+        public makeMilk(coffeeCup : CoffeCup):CoffeCup{
+            // TODO .. Busi Logic
+        }
+    }
+
+    // 설탕을 추가하는 기능 - SugarProvider 구현
+    class AutomaticSugarMixer implements SugarProvider{
+        public makeSugar(coffeeCup : CoffeCup):CoffeCup{
+            // TODO .. Busi Logic
+        }
+    }
+    
+    // 칼로리 설탕을 추가하는 기능 - SugarProvider 구현
+    class ZeroSugarMixer implements SugarProvider{
+        public makeSugar(coffeeCup : CoffeCup):CoffeCup{
+            // TODO .. Busi Logic
+        }
+    }
+
+    /////////////////////////////////////////////////////////////
+
+    /**
+     * 💬 생성 메서드에서 받은 매개변수의 참조 타입이 Interface로 변경되어
+     *    - 결합도가 낮아졌다.
+     *    - 따라서 다양한 종류의 유우, 설탕을 넣어줄수 있게 되었다.
+     *    - 해당 Class하나만 바꾸면 문제가 될것이 없어졌다.
+     */
+    class CaffeLateMachine extends CoffeMakerImpl{
+        public constructor(coffeBeans : number
+                            , private readonly serialNumber : string
+                            // ✅ 직접 Class가 아닌 Interface 참조
+                            , private milkeSteamer : MilkeForther){
+            super(coffeBeans);
+        };
+        
+        public makeCoffe(shots: number):CoffeCup{
+            const coffeParent:CoffeCup = super.makeCoffe(shots);        
+            return this.milkeSteamer.makeMilk(coffeParent);
+        } 
+    }
+
+    // Interface를 통해 다영성을 사용하여 여러종류의 Steamer생성
+    const cheapMilkSteamer:MilkeForther     = new CheapMilkSteamer();
+    const highLevelMilkSteamer:MilkeForther = new HighLevelMilkSteamer();
+    const coldlMilkSteamer:MilkeForther     = new ColdMilkSteamer();
+    
+    const cheapLatteMachin      = new CaffeLateMachine(200 ,"Serial", cheapMilkSteamer);
+    const highLevelLatteMachin  = new CaffeLateMachine(200 ,"Serial", highLevelMilkSteamer);
+    const coldLatteMachin       = new CaffeLateMachine(200 ,"Serial", coldlMilkSteamer);
+    
+    //__Eof__
+}
+```
+<br/>
+🔽 상단의 코드 개선 - 한가지 생성 class로 처리가능하게
+
+```typescript
+// TyepScript - 코드 개선
+
+{
+    type CoffeCup = {
+        shots : number;
+        hasMilik? : boolean;
+        hasSugar? : boolean;
+    }
+
+    interface IcoffeMaker{
+        makeCoffe(shots: number):CoffeCup;
+    }
+
+    // 결합도를 낮추기 위한 Milke Interface
+    interface MilkeForther{
+        makeMilk(coffeeCup : CoffeCup):CoffeCup;
+    }
+
+    // 결합도를 낮추기 위한 Suger Interface
+    interface SugarProvider{
+        makeSugar(coffeeCup : CoffeCup):CoffeCup;
+    }
+
+    // 우유를 스팀하는 기능 - MilkeForther 구현
+    class CheapMilkSteamer implements MilkeForther{        
+       // Code..
+    }
+
+    // 비싼 우유 스팀 기능을한다 - MilkeForther 구현
+    class HighLevelMilkSteamer implements MilkeForther{
+        // Code..
+    }
+
+    // 차가운 우유 스팀 기능을한다 - MilkeForther 구현
+    class ColdMilkSteamer implements MilkeForther{
+        // Code..
+    }
+
+    class NoMilk implements MilkeForther{
+        // Code..
+    }
+
+    // 설탕을 추가하는 기능 - SugarProvider 구현
+    class NormalSugarMixer implements SugarProvider{
+        // Code..
+    }
+    
+    // 칼로리 설탕을 추가하는 기능 - SugarProvider 구현
+    class ZeroSugarMixer implements SugarProvider{
+        // Code..
+    }
+
+    class NoSugar implements SugarProvider{ 
+        // Code..
+    }
+
+    class CoffeMakerImpl implements IcoffeMaker{
+        private static readonly BEANS_GRAMM_PER_SHOT : number = 7; 
+        
+        // 👉 생성자메서드 파라미터로 인터페이스를 받음                 
+        public constructor(private coffeBeans : number
+                            , private milkeForther:MilkeForther
+                            , private sugarProvider:SugarProvider ){
+            this.coffeBeans     = coffeBeans;
+            this.milkeForther   = milkeForther;
+            this.sugarProvider  = sugarProvider;
+        }
+        
+        protected grindBeans(shots:number){
+            console.log(`${shots}잔에 필요한 커피콩 갈기`);            
+            if(this.coffeBeans < shots * CoffeMakerImpl.BEANS_GRAMM_PER_SHOT){
+                throw new Error("커피콩의 양이 부족합니다.")
+            }            
+            this.coffeBeans -= shots * CoffeMakerImpl.BEANS_GRAMM_PER_SHOT;
+        }
+
+        protected extract(shots : number):CoffeCup{
+            return {                
+                shots
+            }
+        }
+        
+        public makeCoffe(shots: number):CoffeCup{
+            this.grindBeans(shots);
+            /*
+            * 👉 다형성 사용으로 값을 추가 하여 Return
+            */
+            const baseCoffee:CoffeCup = this.extract(shots);
+            const addSugar: CoffeCup  = this.sugarProvider.makeSugar(baseCoffee);            
+            return this.milkeForther.makeMilk(addSugar);
+        }   
+    }   
+    
+    // Milke
+    const cheapMilkSteamer:MilkeForther     = new CheapMilkSteamer();
+    const highLevelMilkSteamer:MilkeForther = new HighLevelMilkSteamer();
+    const coldMilkSteamer:MilkeForther      = new ColdMilkSteamer();
+    const noMilkSteamer:MilkeForther        = new NoMilk();
+    // Sugar
+    const normalSugarMixer:SugarProvider    = new NormalSugarMixer();
+    const zeroSugarMixer:SugarProvider      = new ZeroSugarMixer();
+    const noSugar:SugarProvider             = new NoSugar();
+
+    /**
+     * 다양한 조합으로 생성이 가능해짐
+     */
+    const coffeeMachine1 = new CoffeMakerImpl(200,cheapMilkSteamer,noSugar);
+    const coffeeMachine2 = new CoffeMakerImpl(200,highLevelMilkSteamer,zeroSugarMixer);
+    console.log(coffeeMachine1);
+    console.log(coffeeMachine1.makeCoffe(3));
+    console.log(coffeeMachine2);
+    console.log(coffeeMachine2.makeCoffe(3));
+
+    //__Eof__
+}
+```
