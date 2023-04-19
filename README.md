@@ -1577,3 +1577,172 @@
     //__Eof__
 }
 ```
+
+<hr/>
+
+## OOP(객체지향 프로그래밍) - 활용 예제 [ Stack ]
+
+- 알아두면 좋은 내용
+  - 내부에서만 사용한다는 의미로 "_"를 앞에 붙여 사용 하기도한다.
+    - getter, setter를 위한 방식 알아두기만 하자
+  - "===" 가 무조건 좋은게 아니다.                          
+    - 좀 더 목적에 맞게끔 사용하는것이 중요하다.
+      - ex)                                           
+      - null == undefined 👍                          
+      - null === undefined 👎
+      -  위와 같이  "==" 하나만 써서 두가지를 동시에 체크가 가능하다.
+
+- Stack 구현 코드 간략 설명
+  1. 신규값이 추가된다. ****(push)****
+  2. 노드를 생성한다. { 값 , 현재 head위치 } **👉 여기서 중요한건 head란 node 전체를 가르키는 것이다.**
+  3. 또 다른 값이 추가될 경우
+  4. 노드를 생성한다. {값 , 현재 head위치 } **👉 2번에서 생성된 노드가 현재 head이다.**
+  5. 출력요청 ****(pop)****
+  6. 현재 head값 유무 확인
+  7. 있을 경우 현재 head의 value 출력
+  8. 현재 head변경 -> 현재 head.next
+```typescript
+// TypeScript - Stack
+
+{
+    interface Stack {
+        readonly size: number;
+        push(value: string): void;
+        pop(): string;
+      }
+      
+      type StackNode = {
+        readonly value: string;
+        readonly next?: StackNode;
+      };
+
+    class StackImpl implements Stack{
+        
+        private _size: number = 0;        
+
+        // ✅ 해드가 처음에는 없을수도 있으니 Optional 체이닝은 필수다!
+        private head?:StackNode;
+
+        /***
+         * ❌ 내가 하려던 방법..
+         * 어떻게 여러개를 사용하지 했었는데
+         * 이렇게 맴머 변수로 쓰면 불가능하다 당연히..
+         */
+        //private _node:StackNode;  👎
+
+        get size(){
+            return this._size;
+        }
+        public push(value: string): void {            
+            const node: StackNode = { value, next: this.head };
+            this.head = node;
+            this._size++;
+        }
+
+        pop(): string {
+            if (this.head == null) {
+              throw new Error('Stack is empty!');
+            }
+            const node = this.head;
+            this.head = node.next;
+            this._size--;
+            return node.value;
+          }    
+    }
+
+    const stack:Stack = new StackImpl();
+    stack.push("yoo1");
+    stack.push("yoo2");
+    stack.push("yoo3");
+    console.log(stack.pop()); //yoo3
+    console.log(stack.pop()); //yoo2
+    console.log(stack.pop()); //yoo1
+}
+```
+
+<hr/>
+
+## OOP(객체지향 프로그래밍) - 활용 예제 [ Queue ]
+
+- 이해가 안 됐던 부분 설명
+  1. dequeue()매서드 실행
+  2. this.head = this.head.next;
+  2. ? this.head.next값을 변경한적이 없는데 바뀌어있음
+  3. 👉 이유 ? 프로퍼티 공유 때문임
+  4. enqueue(value: string)메서드 실행
+  5. this.head는 계속해서 값이 변경됨 
+```typescript
+// TypeScript - Queue
+
+{   
+    interface Queue{
+        enqueue(value:string):void;
+        dequeue():string;
+    }
+
+    type QueueNode = {
+        readonly value : string,
+        next? : QueueNode         
+    }
+
+    class QueueImple implements Queue{
+
+        private head? : QueueNode | undefined;
+        // Stack과 다르게 tail이 필요함.
+        private tail? : QueueNode | undefined;
+
+        // ⭐️ 추가 시
+        enqueue(value: string) {            
+            // 1 . 노드 생성 {파라미터값 , 현재 존재하는 head}
+            const inputNode = {value, next: this.head};
+            // 2 . tail 존재 확인 [ 처음들어올 경우 항상 없고 다음 부터는 항상 있음]
+            if(!this.tail){ // 👉 tail이 없을 경우
+                // 2 - 1 . head에 초기값 등록 최초의 값임
+                this.head = inputNode;
+                // 2 - 3 . tail에 값 등록 - 계속 변할 것임
+                this.tail = inputNode;
+            } else {       // 👉 tail이 있을 경우
+                // 2 - 4 . tail.next에 노드 값 변경 
+                this.tail.next = inputNode;
+                // 2 - 5 . tail 값 변경
+                this.tail = inputNode;
+            }
+        }
+
+        dequeue(): string {            
+            if(!this.head) throw new Error("Error!!");
+            
+            // 현재의 해드를 바라봄 - 최초의 해드
+            const removeNode = this.head;
+
+            /**
+             * 둘이 같아질 경우는 값이 값이 없을 경우 뿐임
+             *  - 이유 ?
+             *    - 소모 시 head 값만 변경되기 떄문임
+             */
+            if(this.head === this.tail)    {
+                this.head = undefined;
+                this.tail = undefined;
+            } else {
+                // 바라보는 head 변경
+                this.head = this.head.next;
+            }
+
+            return removeNode.value;
+        }
+    }
+
+    const queue:Queue = new QueueImple();
+    queue.enqueue("1");
+    queue.enqueue("2");
+    queue.enqueue("33");
+    queue.enqueue("44");
+   
+    console.log(queue.dequeue());
+    console.log(queue.dequeue());
+    // console.log(queue.dequeue());
+    // console.log(queue.dequeue());
+    // console.log(queue.dequeue());
+
+}
+```
