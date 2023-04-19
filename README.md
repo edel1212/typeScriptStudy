@@ -1746,3 +1746,158 @@
 
 }
 ```
+
+<hr/>
+
+## OOP(객체지향 프로그래밍) - Generic 이란?
+
+- 타입을 선언하여 사용하여 안전하며 활용성이 올라감.
+
+🔽 확장성 및 안전성
+```typescript
+// TypeScript - Generic의 확장성
+
+{
+    // 숫자만 가능함 한가지 Class 사용만으로
+    // 여러가지를 넣고 싶은데..
+    function checkNotNullBad(arg:number | null){
+        if(arg == null) throw new Error("Error!!!");
+        return arg;
+    }
+
+    // any사용 -> 원하는 바를 이뤘지만 타입 보장이 힘듬
+    function checkNotAnyBad(arg:any | null){
+        if(arg == null) throw new Error("Error!!!");
+        return arg;
+    }   
+
+    // 제네릭을 이용하여 사용하면 가능하다 👍 
+    function checkNotNullGood< T >(arg:T | null):T{
+        if(arg == null) throw new Error("Error!!!");
+        return arg;
+    }   
+
+    const genericTest1:number = checkNotNullGood(2);
+    //const genericTest2:string = checkNotNullGood("❌ 숫자이기에 Error");
+    console.log(genericTest1);
+    console.log(checkNotNullGood("asdas"));
+}
+```
+
+<br/>
+
+🔽 Class에서 사용
+```typescript
+// TypeScript - Class에 적용
+
+{
+    interface Either<L, R> {
+        left : ()=> L;
+        right : ()=> R;
+    }
+
+    class SimpleEither<L, R> implements Either<L, R>{
+        constructor(private leftValue : L , private rightVale : R){};
+
+        public left():L{
+            return this.leftValue;
+        }
+        public right():R{
+            return this.rightVale;
+        }
+    }
+
+    ///////////////////////////////////////
+    const either:Either<string, number[]> = new SimpleEither("yoo",[1,2,3]);
+    const either2:Either<number, number> = new SimpleEither(1,1);
+}
+```
+
+<br/>
+
+🔽 Generic에 제약을 거는 방법
+```typescript
+// TypeScript - 제한을 둠
+
+/**
+ * Generic - constraints(제약)
+ * - 제네릭에 들어갈 타입을 강제 하는것
+ */
+{
+    interface Employee{
+        pay():void;
+    }
+
+    class FullTimeEmployee implements Employee{
+        pay(): void {
+            console.log(`Full Time work....`);
+        }
+        public workFullTime(){};
+    }
+
+    class PartTimeEmployee implements Employee{
+        pay(): void {
+            console.log(`Part Time work....`);
+        }
+        public workPartTime(){};
+    }
+
+    /** 나쁜 코드 👎
+     * 👉 세부적인 타입을 파라미터로 받은후 
+     *    리턴을 추상적인걸로 해버렸기 때문임
+     * 
+     * ex) 아래 코드 예시로
+     *      받을때 : FullTimeEmployee - class
+     *      보낼때 : Employee         - interface
+     * s
+     * 그냥 Employee로 바꿔버림으로 
+     * 내부 갖고있던 메서드를 잊어버림
+     * - workFullTime()
+     * - workPartTime(
+     */
+    function payBad(employee:Employee):Employee{
+        employee.pay();
+        return employee;
+    }
+
+    /** 개선 코드 👍
+     * 제네릭을 사용하고 Employee또는 구현한 클래스를 받게 끔 하였음
+     */
+    function pay<T extends Employee>(employee:T):T{
+        employee.pay();
+        return employee;
+    }
+
+    //////////////////////////////////////////////////////
+    const yoo:FullTimeEmployee = new FullTimeEmployee();
+    const gom:PartTimeEmployee = new PartTimeEmployee();
+    yoo.workFullTime();
+    gom.workPartTime();
+
+    const yooAfterPay = payBad(yoo);    
+    // yooAfterPay.FullTimeEmployee(); ❌ 불가능함 Interface를 반환해버림 ...
+
+    // 제네릭을 통해 workPartTime()가 사라지지 않았음
+    const gomAfterPay = pay(gom);
+    gomAfterPay.workPartTime();
+    
+
+    //////////////////////////////////////////////////////
+
+    /**
+     * 제네릭 K를 keyof T 로 제한을 둬서 
+     * 해당 메서드의 반환겂을 T[K]로 지정이 가능하다.
+     */
+    function getValue<T,K extends keyof T>(obj:T,key:K):T[K]{
+        return obj[key];
+    }
+
+    const obj = {name : "yoo",age : 20};
+    const obj2 = {animal : "dog"};
+
+    getValue(obj,"name");       // yoo
+    getValue(obj,"age");        // 20
+    getValue(obj2,"animal");    // dog
+    
+}
+```
