@@ -1904,7 +1904,7 @@
 
 <hr/>
 
-## OOP(객체지향 프로그래밍) - Exception 이란?
+## Exception 이란?
 
 - 다른 언어에서는 Exceiption Class가 있지만 javascrip에는 없다.
 - 대신 javascript에는 Error Class가 존재함
@@ -1992,6 +1992,73 @@
                 // 에러 처리 로직!   
             }            
         }
+    }
+}
+```
+
+<hr/>
+
+## Type , Interface 차이
+
+|     종류     | 설명                                  |
+|:----------:|:------------------------------------|
+| Interface  | 서로간의 계약서, 약속 , 상호작용, 규격을 정하는것       |
+|    Type    | 사용되는 데이터의 담는 형식을 정하는 목적으로 사용하는것이 맞다 |
+
+```typescript
+// TypeScript - Type, Interface 차이
+
+{
+    type PositonType = { x : number; y : number; }
+
+    interface PositionInterface{ x : number; y : number; }
+
+    // 👉 Object 생성 [ 둘가 가능 ]
+    const obj1:PositonType = {x : 1, y : 1}
+    const obj2:PositionInterface = {x : 1, y : 1, z:1}
+   
+    // 👉 확장 방법 [ Interface ] -재선언 후 추가
+    interface PositionInterface{
+        // x : string ❌ 중복일 경우 Error:  'x' was also declared here.
+        z : number
+    }
+
+    // 👉 확장 방법 [ Type ] - "&" 를 사용하여 새로 생성
+    type ZPosition = PositonType & {z : number};
+    const obj3:ZPosition = {x : 1, y : 1, z:1}
+}
+```
+
+
+<hr/>
+
+## Index를 사용한 Type선언
+
+```typescript
+// TypeScript - Index를 사용한 타입 선언
+
+/**
+ * Type을 정의 해 놓고 
+ * Json의 value를 사용하는것 처럼 해당 
+ * 타입을 가져다 쓸수 있다.
+ */
+{
+    type Person = {
+        name : string;
+        age : number;
+        gender : "male" | "female"
+    }
+
+    type StringType = Person['name'];  // string
+
+    type NumberType = Person['age']    // number
+
+    type GenderType = Person['gender'] // 'male' or 'female'
+
+    // 내부에서도 사용가능
+    type Pet = {
+        name   : Person['name'];    // string
+        gender : Person['gender'];  // 'male' or 'female'
     }
 }
 ```
