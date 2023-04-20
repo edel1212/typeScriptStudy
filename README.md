@@ -2032,16 +2032,14 @@
 
 <hr/>
 
-## Index를 사용한 Type선언
+## 다양한 Type 선언 방식
 
+🔽 Index를 사용한 Type선언
+- Json의 value를 사용하는것 처럼 원하는 타입을 가져다 쓸수 있다.
+- 
 ```typescript
 // TypeScript - Index를 사용한 타입 선언
 
-/**
- * Type을 정의 해 놓고 
- * Json의 value를 사용하는것 처럼 해당 
- * 타입을 가져다 쓸수 있다.
- */
 {
     type Person = {
         name : string;
@@ -2060,5 +2058,74 @@
         name   : Person['name'];    // string
         gender : Person['gender'];  // 'male' or 'female'
     }
+}
+```
+
+<br/>
+
+🔽 Map 방식을 사용한 Type선언
+- 여기서 말하는 Map은 자료구조가 아닌 배열에서 사용되는 map()을 의미한다.  
+   ex) [1,2].map(()=>{})
+- 값을 바꾸는 용도로 보면된다.
+
+
+- 사용이유?
+  - 옵션을 넣고싶을 경우
+  - 해탕 타입의 값을 완전히 바꾸싶은 경우
+  - 상위 타입의 내용을 바꾸면 하위도 같이 바뀌게 하고 싶은경우
+```typescript
+// TypeScript - Map방식을 사용한 타입 선언
+
+{
+    type Person = {
+        name : string,
+        age : number,
+        gender : "male" | "female"
+    }
+
+    /**
+     * 아래와 같이만들수도 있지만 
+     * 만약 gender가 필요없어지면 
+     * Person도 변경해야하고 OptionalPersone도 
+     * 변경해야 하기에 이래저래 번거로워진다.
+     */
+    type OptionalPerson = {
+        name? : string,
+        age? : number,
+        gender? : "male" | "female"
+    }
+
+    // Optional Type
+    type UsedMapPerson<T> = {
+        [P in keyof T]? : T[P]; // 반복문 문법 in 사용
+    }
+
+    // ReadOnly Type
+    type UsedMapPersonVerReadonly<T> = {
+        readonly [P in keyof T] : T[P]; // 반복문 문법 in 사용         
+    }
+
+    // 타입 자체를 완전 변환도 가능
+    type Proxy<T> = {
+        get():T;
+        set(value : T):void;
+    }
+    type Proxify<T> = {
+        [P in keyof T]: Proxy<T[P]>; // map처럼 활용 가능하다
+    }
+
+    ////////////////////////////////////////////////////
+    // 사용 방법 : 해당 Type을 Generic에 추가해주면 된다.
+
+    // 값이 없어도 에러 없다
+    const useMap:UsedMapPerson<Person> = {}; 
+
+    // 값 변경이 불가능
+    const useMapVerReadonly:UsedMapPersonVerReadonly<Person> = {
+        name : 'yoo',
+        age : 20,
+        gender : 'female'
+    }; 
+    // ❌ useMapVerReadonly.name = 'gim'  // Error : ReadOnly이기 때문이다.
 }
 ```
