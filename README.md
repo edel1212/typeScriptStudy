@@ -1901,3 +1901,97 @@
     
 }
 ```
+
+<hr/>
+
+## OOP(객체지향 프로그래밍) - Exception 이란?
+
+- 다른 언어에서는 Exceiption Class가 있지만 javascrip에는 없다.
+- 대신 javascript에는 Error Class가 존재함
+- 예외가 발생할 부분에 try - catch를 사용하면 프로그램이 종료되지 않고 처리가 가능하다.
+- 반드시 실행되어야 하는 로직은 finally에서 처리한다.
+
+- 에러의 큰 종류
+  - 컴파일에러   : 컴파일시 잡아낼수 있는 에러
+  - 런타임 에러  : 컴파일시 잡지 못하고 작동중 생성되는 에러 ☠️굉장히 위험☠️
+
+```typescript
+// TypeScript - Exception 처리
+
+{
+    // file을 읽는 기능을 하는 함수
+    function readFile(fileName:string):string{
+        if(fileName === 'not exist'){
+            throw new  Error(`file not exist! ${fileName}`);
+        }
+        return 'file content!';
+    }
+
+    // fileRead 종료함수    
+    function closeFile(fileName:string){}
+
+    // Exception Test   👎 
+    const fileName = 'not exist';
+    //const readFileContent = readFile(fileName);
+    //console.log(readFileContent);
+    //closeFile(fileName);
+
+
+    // Exception Test 👍 
+    // - 예외 발샐할 부분만 감싸서 써주는것이 좋다!
+    // - finally에 필수로 종료될 로직이 있으면 꼭 작성해주자
+    //    - catch에서 return을 해버리면 무시되기 때문이다.
+    // .. logic ...
+    try {        
+        const readFileContent = readFile(fileName);
+        console.log(readFileContent);        
+    } catch (error) {
+        console.log(`caught Erro!!`); // caught Erro!!
+        console.error(error);         // file not exist! ${fileName}
+    } finally{
+      closeFile(fileName);
+    }
+    // .. logic ..    
+}
+
+
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+
+// TypeScript - 효율적인 Hanlding    
+
+/**
+ * Exception Handling
+ * - 기본적으로 에러를 처리 해줄수 있는곳에서 처리해주자
+ * - 애매하게 처리 불가능한 곳에서 try - catch를 해버리면 해결 방법이
+ *   적어질 뿐만 아니라 좀더 어려워질 가능성이 있음
+ */
+{
+    class NetworkClient{
+        public tryConnect():void{
+            throw new Error(`no network!!`);
+        }
+    }
+
+    class UserService{
+        constructor(private networkClient:NetworkClient){}
+
+        public login():void{
+            this.networkClient.tryConnect();
+            // login...
+        }
+    }
+
+    class App {
+        constructor(private userServie:UserService){}
+        public run():void{
+            try {
+                this.userServie.login();    
+            } catch (error) {
+                console.log("여기서 처리하는 방법이 더 좋은 방법이다.👍");
+                // 에러 처리 로직!   
+            }            
+        }
+    }
+}
+```
