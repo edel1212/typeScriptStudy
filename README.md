@@ -24,12 +24,76 @@
 <hr/>
 
 ## Typescript파일 컴파일 방법
-- 1 . tsc 파일명.ts
-  - 같은 경로에 js파일로 컴파일 해줌 
-- 2 . tsc -w 파일명.ts 
-  - 변화가 있을경우 감지하여 자동으로 컴파일해 줌\
+- 1 . 같은 경로의 .ts -> .js  변환 
+  - > tsc 파일명.ts
+- 2 . .ts파일에 변화가 있을 경우 자동으로 컴파일해 줌\
+  - > tsc -w 파일명.ts 
   
  <hr/>
+
+
+## Typescript config 생성 방법
+
+- typescript 설정파일 생성 - Terminal 기준 [ 경로는 상황에 맞춰서 지정 필요함 ] 
+  - >tsc --init
+- tsconfig.json가 생성된 디레토리의 ts파일이 변경이 있을 경우 자동으로 컴파일 된다. **👉 [ 하나만 선택이 아닌 전부 ]**
+  - > tsc -w 
+
+
+<hr/>
+
+
+## Typescript config 생성 방법
+
+- outDir : "DirectoryPath" 
+  - **"./생성될 js 경로"** 가 들어간다.
+    - ☠️ 주의할 점은 읽는 ts 파일의 시작점으로 부터 생성된다.
+      - ex)  ./src/ts파일 2개 **-- 변환 -->** ./build/js파일 2개   [ 결과로 변환된다. ]
+    - ✅ 원하는 방향대로 설정 ./src/test.ts , ./src/log/logging.ts   
+    **-- 변환 -->**  ./build/test.js , ./src/log/logging.js [ 결과 반환해줌 ]
+- rootDir  : "DirectoryPath"  
+  - **"./ts파일을 읽기 시작할 경로"** 가 들어간다.  
+- incremental : boolean  
+  - 변경된 사항만을 컴파일하여 변경할지 설정 - True일 경우 컴파일은 빨라 지나 수정사항을 간직하고 있기에   용량을 차지 할 수 있음
+- target : "version"
+  - 변경될 js파일의 버전을 선택할 수 있다.
+- module : "version"
+  - 변경될 js의 모듈타입을 정할 수 있음 web일 경우 ES버전으로 맞춰주자
+- allowJs : boolean
+  - ts와 js를 섞어서 사용할지 설정
+- checkJs : boolean
+  - js파일에서 오류사항을 체크해줌   **[ allowJs와 세트와 거의 항상 같은 값임 ]**
+- sourceMap : boolean
+  - ts에서 작성된 내용으로 디버깅이 가능함 
+- outFile : "DirectoryPath"
+  - js로 변환될 파일을 하나로 만들어줌
+- removeComments : boolean
+  - 주석 삭제
+- noEmit : boolean
+  - 컴파일 체크만 하고 js변경을 하지 않음 
+
+<br/>
+
+- 원하는 파일을 js변환 제외
+```json
+// tsconfig.json
+
+{
+  "compilerOptions": {  },
+  "exclude": ["./src/dev.ts"]  // 👉   배열 혈식으로 추가 가능
+}
+```
+- 원하는 파일만 js변환
+```json
+// tsconfig.json
+
+{
+  "compilerOptions": {  },
+  "include": ["./src/dev.ts"]  // 👉   배열 혈식으로 추가 가능
+}
+```
+
+<hr/>
 
 ## Type별 사용 예시
 ```typescript
